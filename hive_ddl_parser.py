@@ -77,7 +77,13 @@ class HiveDDLParser(object):
                 setattr(self, 'is_partitioned', False)  # set is_partitioned False
             else:
                 setattr(self, 'is_partitioned', True)  # set is_partitioned True
-            setattr(self, 'location', match.group("loc").strip().replace("'", ""))  # set location
+
+            # check for location
+            if match.group("loc") is not None:
+                setattr(self, 'location', match.group("loc").strip().replace("'", ""))  # set location
+            else:
+                setattr(self, 'location', None)  # set attribute to None
+
         else:
             raise Exception("Unable to parse SHOW CREATE TABLE DDL")
 

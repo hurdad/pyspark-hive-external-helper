@@ -35,6 +35,10 @@ def main():
     # parse ddl for table
     obj = HiveDDLParser(sc=sc, sqlContext=sqlContext, database=args.database, table=args.table)
 
+    # if we dont have location then the table is not external!
+    if obj.location is None:
+        raise Exception('Table is not external!')
+
     # parse hdfs path
     match = re.match('hdfs:\/\/(.*?)(\/.*)', obj.location)
     if match:
