@@ -18,7 +18,7 @@ def main():
     parser.add_argument("-d", "--debug", action="store_true", help="Enable Debugging")
     parser.add_argument('-db', '--database', required=True)  # hive database name
     parser.add_argument('-t', '--table', required=True)  # hive table name
-    parser.add_argument('-p', '--partitions', required=True, type=json.loads)  # JSON parser
+    parser.add_argument('-p', '--partition', required=True, type=json.loads)  # JSON parser
 
     args = parser.parse_args()
 
@@ -51,18 +51,18 @@ def main():
                                                                    ", ".join(partition_columns))
     path = hdfs_path + "/" + "/".join([p[0] + "={" + p[0] + "}" for p in obj.partitioned_columns])
 
-    # loop parameter partitions
-    for p in args.partitions:
+    # get partition to drop
+    p = args.partition
 
-        # Drop Partition
-        logger.info("running sql : {}".format(sql.format(**p)))
-        sqlContext.sql(sql.format(**p))
+    # drop Partition in hive
+    logger.info("running sql : {}".format(sql.format(**p)))
+    sqlContext.sql(sql.format(**p))
 
-        # Check if partition hdfs folder exist and Delete
-        logger.info("hdfs test -d : {}".format(path.format(**p)))
-        if hdfs.direxists(path.format(**p)):
-            logger.info("hdfs rm -r : {}".format(path.format(**p)))
-            hdfs.rm('-r', path.format(**p))
+    # check if partition hdfs folder exist and delete
+    logger.info("hdfs test -d : {}".format(path.format(**p)))
+    if hdfs.direxists(path.format(**p)):
+        logger.info("hdfs rm -r : {}".format(path.format(**p)))
+        hdfs.rm('-r', path.format(**p))
 
 
 if __name__ == "__main__":
